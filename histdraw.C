@@ -168,7 +168,7 @@ void histdraw()
 
   gSystem->MakeDirectory("plots"); //returns -1 if exists
 
-  TFile *f = new TFile("mcdistrubutions.root");
+  TFile *f = new TFile("hists.root");
   auto inc_mcpthat = (TH1F *)f->Get("inc_mcpthat");
   auto dj_mcpthat = (TH1F *)f->Get("dj_mcpthat");
 
