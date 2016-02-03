@@ -33,9 +33,9 @@ void InitStyle()
   gStyle->SetTitleFont(43,"xyz");
   gStyle->SetLabelFont(43,"xyz");
 
-  gStyle->SetTextSize(20);
-  gStyle->SetTitleSize(20,"xyz");
-  gStyle->SetLabelSize(20,"xyz");
+  gStyle->SetTextSize(25);
+  gStyle->SetTitleSize(25,"xyz");
+  gStyle->SetLabelSize(25,"xyz");
 
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
@@ -112,7 +112,7 @@ kpinkLight    = pal->GetColor(255,192,224);
    gStyle->SetTitleColor(kBlue);
    gStyle->SetTitleBorderSize(0);
    gStyle->SetTitleXOffset(1.5);
-   gStyle->SetTitleYOffset(1.5);
+   gStyle->SetTitleYOffset(1.7);
    gStyle->SetLabelOffset(0.01,"X");
    gStyle->SetLabelOffset(0.01,"Y");
    gStyle->SetTitleColor(1,"XYZ");
@@ -126,7 +126,7 @@ kpinkLight    = pal->GetColor(255,192,224);
    gStyle->SetErrorX(0);  
    gStyle->SetMarkerStyle(20);
    //gStyle->SetMarkerSize(1.25);
-   gStyle->SetMarkerSize(1.2);
+   gStyle->SetMarkerSize(1.0);//1.2);
    //gStyle->SetOptFit(1111);
    //gStyle->SetStatColor(0);
    //gStyle->SetStatBorderSize(1);
