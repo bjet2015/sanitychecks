@@ -112,7 +112,7 @@ kpinkLight    = pal->GetColor(255,192,224);
    gStyle->SetTitleColor(kBlue);
    gStyle->SetTitleBorderSize(0);
    gStyle->SetTitleXOffset(1.5);
-   gStyle->SetTitleYOffset(1.7);
+   gStyle->SetTitleYOffset(1.9);
    gStyle->SetLabelOffset(0.01,"X");
    gStyle->SetLabelOffset(0.01,"Y");
    gStyle->SetTitleColor(1,"XYZ");

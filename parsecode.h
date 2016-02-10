@@ -35,6 +35,24 @@ TString getSample(TString code)
   return TString(code(4,3));
 }
 
+TString niceSample(TString sample)
+{
+  if (sample=="j40") return "Jet40";
+  if (sample=="j4_") return "Jet40old";
+
+  if (sample=="qcd") return "qcdPythia6";
+  if (sample=="qp8") return "qcdPythia8";
+
+  return sample;
+}
+
+TString getPythia(TString sample)
+{
+  if (sample=="qcd") return "Pythia 6";
+  if (sample=="qp8") return "Pythia 8";
+  return sample;
+}
+
 TString algo(TString code)
 {
   return TString(code(7,code.Length()-7));
@@ -93,5 +111,5 @@ TString nicepairname(TString code1, TString code2)
 {
   if (!checkcompatibility(code1,code2)) return "incompatible";
   
-  return TString((isPbPb(code1) ? "PbPb_" : "pp_"))+getSample(code1)+"_vs_"+getSample(code2)+"_"+algo(code1);
+  return TString((isPbPb(code1) ? "PbPb_" : "pp_"))+niceSample(getSample(code1))+"_vs_"+niceSample(getSample(code2))+"_"+algo(code1);
 }
