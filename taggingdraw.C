@@ -18,7 +18,10 @@ void DrawVarInc(TString variable, TString description)
   ntdatainc->Project(hdt->GetName(),variable,"weight*(jtpt>120 && discr_csvSimple>0.9)");
 
   Normalize({hdt,hmc});
-  Draw({hdt,hmc});
+  //Draw({hdt,hmc});
+
+  DrawCompare(hdt,hmc,description);
+
 }
 
 void DrawVarDjtLJ(TString variable, TString description)
@@ -32,14 +35,16 @@ void DrawVarDjtLJ(TString variable, TString description)
   // && (abs(refparton_flavorForB0)!=5 && abs(refparton_flavorForB1)!=5)
   // && (abs(refparton_flavorForB0)==5 || abs(refparton_flavorForB1)==5)
 
-  ntqcddjt->Project(hqcd->GetName(),variable,"weight*(jtpt0>100 && discr_csvSimple0>0.9 && (abs(refparton_flavorForB0)!=5 && abs(refparton_flavorForB1)!=5))");
-  ntbjtdjt->Project(hbjt->GetName(),variable,"weight*(jtpt0>100 && discr_csvSimple0>0.9 && (abs(refparton_flavorForB0)==5 || abs(refparton_flavorForB1)==5))");
+  ntqcddjt->Project(hqcd->GetName(),variable,"weight*(jtpt0>120 && discr_csvSimple0>0.9 && (abs(refparton_flavorForB0)!=5 && abs(refparton_flavorForB1)!=5))");
+  ntbjtdjt->Project(hbjt->GetName(),variable,"weight*(jtpt0>120 && discr_csvSimple0>0.9 && (abs(refparton_flavorForB0)==5 || abs(refparton_flavorForB1)==5))");
   hmc->Add(hqcd,hbjt,1.,1.);
 
-  ntdatadjt->Project(hdt->GetName(),variable,"weight*(jtpt0>100 && discr_csvSimple0>0.9)");
+  ntdatadjt->Project(hdt->GetName(),variable,"weight*(jtpt0>120 && discr_csvSimple0>0.9)");
 
   Normalize({hdt,hmc});
-  Draw({hdt,hmc});
+  //Draw({hdt,hmc});
+
+  DrawCompare(hdt,hmc,description);
 }
 
 void DrawVarDjtSJ(TString variable, TString description)
@@ -52,13 +57,15 @@ void DrawVarDjtSJ(TString variable, TString description)
   // && (abs(refparton_flavorForB0)!=5 && abs(refparton_flavorForB1)!=5)
   // && (abs(refparton_flavorForB0)==5 || abs(refparton_flavorForB1)==5)
 
-  ntqcddjt->Project(hqcd->GetName(),variable,"weight*(jtpt0>100 && jtpt1>30 && discr_csvSimple0>0.9 && (abs(refparton_flavorForB0)!=5 && abs(refparton_flavorForB1)!=5))");
-  ntbjtdjt->Project(hbjt->GetName(),variable,"weight*(jtpt0>100 && jtpt1>30 && discr_csvSimple0>0.9 && (abs(refparton_flavorForB0)==5 || abs(refparton_flavorForB1)==5))");
-  ntdatadjt->Project(hdt->GetName(),variable,"weight*(jtpt0>100 && jtpt1>30 && discr_csvSimple0>0.9)");
+  ntqcddjt->Project(hqcd->GetName(),variable,"weight*(jtpt0>120 && jtpt1>30 && discr_csvSimple0>0.9 && (abs(refparton_flavorForB0)!=5 && abs(refparton_flavorForB1)!=5))");
+  ntbjtdjt->Project(hbjt->GetName(),variable,"weight*(jtpt0>120 && jtpt1>30 && discr_csvSimple0>0.9 && (abs(refparton_flavorForB0)==5 || abs(refparton_flavorForB1)==5))");
+  ntdatadjt->Project(hdt->GetName(),variable,"weight*(jtpt0>120 && jtpt1>30 && discr_csvSimple0>0.9)");
   hmc->Add(hqcd,hbjt);
 
   Normalize({hdt,hmc});
-  Draw({hdt,hmc});
+  //Draw({hdt,hmc});
+
+  DrawCompare(hdt,hmc,description);
 }
 
 void Efficiency()
@@ -114,8 +121,8 @@ void EfficiencySJ()
   auto heff1b = geth("hSJeff1b","SJ Efficiency of di-b tagging");
   auto heff2b = geth("hSJeff2b","SJ Efficiency of di-b tagging");
   auto heffb = geth("hSJeffb","SJ Btagging efficiency form B-filtered");
-  ntbjtdjt->Project("hSJeff1b","jtpt1","weight*(jtpt0>100 && discr_csvSimple1>0.9 && pairCode==0)");
-  ntbjtdjt->Project("hSJeff2b","jtpt1","weight*(jtpt0>100 && pairCode==0)");
+  ntbjtdjt->Project("hSJeff1b","jtpt1","weight*(jtpt0>120 && discr_csvSimple1>0.9 && pairCode==0)");
+  ntbjtdjt->Project("hSJeff2b","jtpt1","weight*(jtpt0>120 && pairCode==0)");
   heffb->Divide(heff1b,heff2b,1.,1.,"B");
 
   plotylog=false; plotmean = false;
@@ -137,7 +144,8 @@ void DiscrInc()
   ntdatainc->Project(hcsvdt->GetName(),"discr_csvSimple","weight*(jtpt>120)");
 
   Normalize({hcsvdt,hcsvqcd});
-  Draw({hcsvdt,hcsvqcd});
+  //Draw({hcsvdt,hcsvqcd});
+  DrawCompare(hcsvdt,hcsvqcd,"csv inclusive");
 }
 
 void DiscrLJ()
@@ -149,11 +157,12 @@ void DiscrLJ()
   auto hcsvqcd = geth("hLJcsvqcd","MC LJ CSV discriminator");
   auto hcsvdt = geth("hLJcsvdt","Data LJ CSV discriminator");
 
-  ntqcddjt->Project(hcsvqcd->GetName(),"discr_csvSimple0","weight*(jtpt0>100)");
-  ntdatadjt->Project(hcsvdt->GetName(),"discr_csvSimple0","weight*(jtpt0>100)");
+  ntqcddjt->Project(hcsvqcd->GetName(),"discr_csvSimple0","weight*(jtpt0>120)");
+  ntdatadjt->Project(hcsvdt->GetName(),"discr_csvSimple0","weight*(jtpt0>120)");
 
   Normalize({hcsvdt,hcsvqcd});
-  Draw({hcsvdt,hcsvqcd});
+  //Draw({hcsvdt,hcsvqcd});
+  DrawCompare(hcsvdt,hcsvqcd,"csv Leading jet");
 }
 
 
@@ -166,11 +175,12 @@ void DiscrSJ()
   auto hcsvqcd = geth("hSJcsvqcd","MC SJ CSV discriminator");
   auto hcsvdt = geth("hSJcsvdt","Data SJ CSV discriminator");
 
-  ntqcddjt->Project(hcsvqcd->GetName(),"discr_csvSimple1","weight*(jtpt0>100 && jtpt1>30)");
-  ntdatadjt->Project(hcsvdt->GetName(),"discr_csvSimple1","weight*(jtpt0>100 && jtpt1>30)");
+  ntqcddjt->Project(hcsvqcd->GetName(),"discr_csvSimple1","weight*(jtpt0>120 && jtpt1>30)");
+  ntdatadjt->Project(hcsvdt->GetName(),"discr_csvSimple1","weight*(jtpt0>120 && jtpt1>30)");
 
   Normalize({hcsvdt,hcsvqcd});
-  Draw({hcsvdt,hcsvqcd});
+  //Draw({hcsvdt,hcsvqcd});
+  DrawCompare(hcsvdt,hcsvqcd,"csv Subleading jet");
 }
 
 
@@ -195,17 +205,26 @@ void taggingdraw()
   Efficiency();
 
   plotylog = true;
+  aktstring+="PF R=0.4";
+  plotsecondline = "jtpt>120 && csv>0.9";
+
   DiscrInc();
   buildxmax = 10;
   DrawVarInc("svtxm","Sec vertex mass");
-  buildxmax = 15;
-  DrawVarInc("svtxdl","Distance to svtx");
+  buildxmax = 400;
+  DrawVarInc("svtxpt","Sec vertex pt");
+  buildxmax = 300;
+  DrawVarInc("svtxdls","Distance significance to svtx");
   buildxmax = 12; buildnbins = 12;
   DrawVarInc("svtxntrk","N tracks in svtx");
   buildxmax = 4; buildnbins = 4;
   DrawVarInc("nsvtx","Number of svtx");
+  buildxmax = 4; buildnbins = 50;
+  DrawVarInc("discr_prob","Jet probability");
+  buildxmax = 50;
+  DrawVarInc("nselIPtrk","N tracks in JP");
 
-
+  plotsecondline = "jtpt0>120 && csv0>0.9";
   
   EfficiencyLJ();
   plotylog = true;
@@ -213,25 +232,40 @@ void taggingdraw()
 
   buildxmax = 10;
   DrawVarDjtLJ("svtxm0","LJ Sec vertex mass");
-  buildxmax = 15;
-  DrawVarDjtLJ("svtxdl0","LJ Distance to svtx");
+  buildxmax = 400;
+  DrawVarDjtLJ("svtxpt0","LJ Sec vertex pt");
+  buildxmax = 300;
+  DrawVarDjtLJ("svtxdls0","LJ Distance significance to svtx");
   buildxmax = 12; buildnbins = 12;
   DrawVarDjtLJ("svtxntrk0","LJ N tracks in svtx");
   buildxmax = 4; buildnbins = 4;
   DrawVarDjtLJ("nsvtx0","LJ Number of svtx");
+  buildxmax = 4;buildnbins = 50;
+  DrawVarDjtLJ("discr_prob0","LJ Jet probability");
+  buildxmax = 50;
+  DrawVarDjtLJ("nselIPtrk0","LJ N tracks in JP");
   
-  
+  plotsecondline = "jtpt0>120 && csv0>0.9";
+  plotthirdline = "jtpt1>30";
+
+
   EfficiencySJ();
   plotylog = true;
   DiscrSJ();
 
   buildxmax = 10;
   DrawVarDjtSJ("svtxm1","SJ Sec vertex mass");
-  buildxmax = 15;
-  DrawVarDjtSJ("svtxdl1","SJ Distance to svtx");
+  buildxmax = 400;
+  DrawVarDjtLJ("svtxpt1","SJ Sec vertex pt");
+  buildxmax = 300;
+  DrawVarDjtSJ("svtxdls1","SJ Distance significance to svtx");
   buildxmax = 12; buildnbins = 12;
   DrawVarDjtSJ("svtxntrk1","SJ N tracks in svtx");
   buildxmax = 4; buildnbins = 4;
   DrawVarDjtSJ("nsvtx1","SJ Number of svtx");
-  
+  buildxmax = 4; buildnbins = 50;
+  DrawVarDjtSJ("discr_prob1","Jet probability");
+  buildxmax = 50;
+  DrawVarDjtSJ("nselIPtrk1","N tracks in JP");
+
 }

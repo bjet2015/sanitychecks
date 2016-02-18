@@ -41,6 +41,8 @@ TString nicewidthstr(TH1F *h)
 TString plotsfolder = "plots";
 bool PbPb = true;
 TString aktstring = "anti-k_{T}";
+TString plotsecondline = "";
+TString plotthirdline = "";
 
 TString centralityLabel = "";
 
@@ -110,7 +112,7 @@ TCanvas *Draw(vector<TH1F *> hists,TString options = "")
 
 }
 
-void DrawCompare(TH1F *h1, TH1F *h2, bool logy=false, TString caption = "A_{J}", TString secondline = "", TString thirdline = "")
+void DrawCompare(TH1F *h1, TH1F *h2, TString caption = "A_{J}")
 {
   float textposx = 0.25, textposy = 0.77;
   TString title = plotYtitle;
@@ -130,7 +132,7 @@ void DrawCompare(TH1F *h1, TH1F *h2, bool logy=false, TString caption = "A_{J}",
   pad1->SetBottomMargin(0.02);
   pad1->Draw();
   pad1->cd();
-  if (logy)
+  if (plotylog)
     pad1->SetLogy();
 
   float legendx1 = 0.58, legendy1 = 0.65, legendx2 = 0.84, legendy2 = 0.84;
@@ -173,10 +175,10 @@ void DrawCompare(TH1F *h1, TH1F *h2, bool logy=false, TString caption = "A_{J}",
 
  TLatex *Tl = new TLatex();
  Tl->DrawLatexNDC(textposx, textposy, aktstring);
- if (secondline!="")
-   Tl->DrawLatexNDC(textposx, textposy-0.075,secondline);
- if (thirdline!="")
-   Tl->DrawLatexNDC(textposx, textposy-0.15,thirdline);
+ if (plotsecondline!="")
+   Tl->DrawLatexNDC(textposx, textposy-0.075,plotsecondline);
+ if (plotthirdline!="")
+   Tl->DrawLatexNDC(textposx, textposy-0.15,plotthirdline);
  Tl->DrawLatexNDC(0.2,0.9,Form("Eff. entries data: %d, mc: %d",
                                (int)h1->GetEffectiveEntries(),(int)h2->GetEffectiveEntries()));
 
