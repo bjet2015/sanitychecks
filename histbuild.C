@@ -1,4 +1,5 @@
 #include "histdraw.C"
+//#include "parsecode.h"
 
 float ptmin = 100;
 float ptmax = 400;
@@ -127,14 +128,14 @@ void checkdatainc(TString datafilename, TString incfilename)
   nt->Project(hphi->GetName(),"jtphi","weight*(jtpt>120)");
 
   auto hJES = new TProfile("inc_JES","inc_JES",ptbins,0,ptmax);//30,200);
-  nt->Project(hJES->GetName(),"jtpt/genpt:genpt","weight*(jtpt>20)","prof");
+  nt->Project(hJES->GetName(),"jtpt/refpt:refpt","weight*(jtpt>20 && refpt>30)","prof");
 
   //  auto hJER = new TProfile("inc_JER","inc_JER",ptbins,30,200);
-  //  nt->Project(hJER->GetName(),"abs(jtpt-genpt)/genpt:genpt","weight","prof");
+  //  nt->Project(hJER->GetName(),"abs(jtpt-refpt)/refpt:refpt","weight","prof");
 
   auto hJER = new TH1F("inc_JER","inc_JER",ptbins,0,ptmax);
   auto htemp=new TProfile("htemp","htemp",ptbins,0,ptmax,"CHOPT='S'"); //easily calculates RMS
-  nt->Project("htemp","jtpt/genpt:genpt","","prof");
+  nt->Project("htemp","jtpt/refpt:refpt","weight*(jtpt>20 && refpt>30)","prof");
   for (int i=1;i<ptbins;i++) {
     hJER->SetBinContent(i,htemp->GetBinError(i));
     hJER->SetBinError(i,htemp->GetBinError(i)/1000); //should be fixed
@@ -184,6 +185,11 @@ void checkdatadj(TString datafilename, TString djfilename)
   nt->Project(hdatabtgdphi->GetName(),"acos(cos(jtphi0-jtphi1))",
               "weight*(dijet && jtpt0>120 && jtpt1>30 && discr_csvSimple0>0.9 && discr_csvSimple1>0.9)");
 
+
+  SetData({hjtpt0,hjtpt1,hdataaj,hdatabtgaj,hdataxj,hdatadphi,hdatadphi2,hdatabtgdphi});
+  SetB({hdatabtgaj,hdatabtgdphi});
+
+
   fout->cd();
   hjtpt0->Write();
   hjtpt1->Write();
@@ -220,13 +226,17 @@ void checkdatadj(TString datafilename, TString djfilename)
   nt->Project(hmcbtgdphi->GetName(),"acos(cos(jtphi0-jtphi1))",
               "weight*(dijet && jtpt0>120 && jtpt1>30 && discr_csvSimple0>0.9 && discr_csvSimple1>0.9)");
 
+  SetMC({hdjjtpt0,hmcjtpt1,hmcaj,hmcbtgaj,hmcxj,hmcdphi,hmcdphi2,hmcbtgdphi});
+  SetInc({hdjjtpt0,hmcjtpt1,hmcaj,hmcxj,hmcdphi,hmcdphi2});
+  SetB({hmcbtgaj,hmcbtgdphi});
+
   auto temp = new TH1F("temp","temp",10,0.5,1.5);
   nt->Project("temp","dijet","weight");
   int numberofdijets = temp->Integral();
   cout<<"# of dijets = "<<numberofdijets<<endl;
-  hmcaj->Scale(1./numberofdijets);
-  hmcxj->Scale(1./numberofdijets);
-  hmcdphi->Scale(1./numberofdijets);
+  //hmcaj->Scale(1./numberofdijets);
+  //hmcxj->Scale(1./numberofdijets);
+  //hmcdphi->Scale(1./numberofdijets);
 
   fout->cd();
   hdjjtpt0->Write();
@@ -240,7 +250,7 @@ void checkdatadj(TString datafilename, TString djfilename)
   f->Close();
 
 }
-  
+
 void checkdatatrig(TString filename)
 {
   TFile *f = new TFile(filename);
@@ -250,7 +260,7 @@ void checkdatatrig(TString filename)
   nt->Project(h->GetName(),"jtpt","weight");
 
   auto h2 = geth("incdatajtpt60",48,0,120);
-  nt->Project(h2->GetName(),"jtpt","weight");
+  nt->Project(h2->GetName(),"jtpt","weight*()");
 
   auto hr = geth("incdatajtpt60ratio",48,0,120);
   hr->Divide(h2,h);
@@ -258,6 +268,30 @@ void checkdatatrig(TString filename)
   vector<TString> trigcuts = {"hltPFJet80", "hltPFJet60 && !hltPFJet80"};
   auto hs = getstack(nt, "trigcomb","jtpt",trigcuts, 72, 0, 180);
   //  hs->SetMinimum(1);
+
+  fout->cd();
+  h->Write();
+  hs->Write();
+  hr->Write();
+  f->Close();
+}
+
+void checkbjetdatatrig(TString filename)
+{
+  TFile *f = new TFile(filename);
+  auto nt = (TTree *)f->Get("nt");
+
+  auto h = geth("incdatajtpt",48,0,120);
+  nt->Project(h->GetName(),"jtpt0","weight");
+
+  auto h2 = geth("incdatajtpt60",48,0,120);
+  nt->Project(h2->GetName(),"jtpt0","weight*(hltCSV60)");
+
+  auto hr = geth("incdatajtpt60ratio",48,0,120);
+  hr->Divide(h2,h);
+
+  vector<TString> trigcuts = {"hltCSV80", "hltCSV60 && !hltCSV80"};
+  auto hs = getstack(nt, "trigcomb","jtpt0",trigcuts, 72, 0, 180);
 
   fout->cd();
   h->Write();
@@ -277,8 +311,12 @@ void checkcentrality(TString datafilename, TString mcfilename)
   auto hdt = new TH1F("centrdt","centrdt",200,0,200); hdt->SetMarkerColor(kBlack);
   auto hmc = new TH1F("centrmc","centrmc",200,0,200); hmc->SetMarkerColor(kBlue);
 
-  tdt->Project("centrdt","bin","weight");
-  tmc->Project("centrmc","bin","weight");
+  SetMC({hmc}); SetInc({hmc});
+  SetData({hdt});
+
+
+  tdt->Project("centrdt","bin","weight*(jtpt0>120 && jtpt1>30)");
+  tmc->Project("centrmc","bin","weight*(jtpt0>120 && jtpt1>30)");
 
   hmc->Scale(hdt->Integral()/hmc->Integral());
 
@@ -291,6 +329,43 @@ void checkcentrality(TString datafilename, TString mcfilename)
 }
 
 
+void histbuildc(TString dtsample, TString mcsample, TString cbin)
+{
+
+  bool PbPb = isPbPb(dtsample);
+
+  //cbin is empty or "low_high" originally
+  TString cbinf = cbin!="" ? "/cbin"+cbin+"/" : "";
+  
+
+  TString mcevt = "/data_CMS/cms/lisniak/bjet2015/"+cbinf+mcsample+"_evt.root";
+  TString dtevt = "/data_CMS/cms/lisniak/bjet2015/"+cbinf+dtsample+"_evt.root";
+  TString mcinc = "/data_CMS/cms/lisniak/bjet2015/"+cbinf+mcsample+"_inc.root";
+  TString dtinc = "/data_CMS/cms/lisniak/bjet2015/"+cbinf+dtsample+"_inc.root";
+  TString mcdjt = "/data_CMS/cms/lisniak/bjet2015/"+cbinf+mcsample+"_djt.root";
+  TString dtdjt = "/data_CMS/cms/lisniak/bjet2015/"+cbinf+dtsample+"_djt.root";
+
+  cout<<"Building "<<(PbPb ? "PbPb" : "pp")<<" histograms..."<<endl;
+  fout = new TFile(Form("%s_%s%s.root",dtsample.Data(),mcsample.Data(),cbin.Data()),"recreate");
+
+  if (PbPb) checkcentrality(dtdjt, mcdjt);
+  /*
+  checkpthat(mcevt, mcinc,"inc_","jtpt"); 
+  //checkpthat(mcdjt,"dj_","jtpt0");
+  */
+    checkpthat(mcevt, mcinc,"inc_","jtpt"); 
+  checkbjetdatatrig(dtdjt);
+  checkdatadj(dtdjt, mcdjt);
+  checkdatainc(dtinc,mcinc); 
+
+
+  fout->Close();
+  
+    histdraw(dtsample, mcsample,cbin);
+}
+
+
+
 void histbuild(TString dtsample, TString mcsample)
 {
   if (!checkcompatibility(dtsample,mcsample)) {
@@ -299,27 +374,13 @@ void histbuild(TString dtsample, TString mcsample)
   }
 
   bool PbPb = isPbPb(dtsample);
-
-  TString mcevt = "/data_CMS/cms/lisniak/bjet2015/"+mcsample+"_evt.root";
-  TString dtevt = "/data_CMS/cms/lisniak/bjet2015/"+dtsample+"_evt.root";
-  TString mcinc = "/data_CMS/cms/lisniak/bjet2015/"+mcsample+"_inc.root";
-  TString dtinc = "/data_CMS/cms/lisniak/bjet2015/"+dtsample+"_inc.root";
-  TString mcdjt = "/data_CMS/cms/lisniak/bjet2015/"+mcsample+"_djt.root";
-  TString dtdjt = "/data_CMS/cms/lisniak/bjet2015/"+dtsample+"_djt.root";
-
-  cout<<"Building "<<(PbPb ? "PbPb" : "pp")<<" histograms..."<<endl;
-  fout = new TFile(Form("%s_%s.root",dtsample.Data(),mcsample.Data()),"recreate");
-
-  if (PbPb) checkcentrality(dtevt, mcevt);
-
-  checkpthat(mcevt, mcinc,"inc_","jtpt");
-  //checkpthat(mcdjt,"dj_","jtpt0");
-  checkdatainc(dtinc,mcinc);
-  checkdatadj(dtdjt, mcdjt);
-
-  checkdatatrig(dtinc);
-
-  fout->Close();
   
-  histdraw(dtsample, mcsample);
+  histbuildc(dtsample,mcsample,"");
+
+  if (PbPb) {
+    histbuildc(dtsample,mcsample,"0_40");
+    histbuildc(dtsample,mcsample,"80_200");
+  }
+
 }
+

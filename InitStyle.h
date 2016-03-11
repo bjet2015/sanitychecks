@@ -23,6 +23,10 @@ void drawText(const char *text, float xp, float yp, int color = kBlack, int size
 
 void InitStyle()
 {
+
+
+
+
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
   
@@ -33,9 +37,9 @@ void InitStyle()
   gStyle->SetTitleFont(43,"xyz");
   gStyle->SetLabelFont(43,"xyz");
 
-  gStyle->SetTextSize(25);
+  gStyle->SetTextSize(20);
   gStyle->SetTitleSize(25,"xyz");
-  gStyle->SetLabelSize(25,"xyz");
+  gStyle->SetLabelSize(20,"xyz");
 
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
@@ -112,7 +116,7 @@ kpinkLight    = pal->GetColor(255,192,224);
    gStyle->SetTitleColor(kBlue);
    gStyle->SetTitleBorderSize(0);
    gStyle->SetTitleXOffset(1.5);
-   gStyle->SetTitleYOffset(1.9);
+   gStyle->SetTitleYOffset(1.7); //1.9
    gStyle->SetLabelOffset(0.01,"X");
    gStyle->SetLabelOffset(0.01,"Y");
    gStyle->SetTitleColor(1,"XYZ");

@@ -1,12 +1,3 @@
-rb histbuild.C\(\"dtppjpfak4PF\",\"mcppqp8ak4PF\"\) &
-rb histbuild.C\(\"dtppjpfak4PF\",\"mcppqcdak4PF\"\) &
-rb histbuild.C\(\"dtPbj4_akVs4PF\",\"mcPbqcdakVs4PF\"\) &
-rb histbuild.C\(\"dtPbj40akVs4PF\",\"mcPbqcdakVs4PF\"\) &
-rb histbuild.C\(\"dtPbj40akVs4PF\",\"mcPbqp8akVs4PF\"\) &
-
-
-
-"
 root -l -q -b histbuild.C\(\"dtppjpfak4PF\",\"mcppqcdak4PF\"\) >out_dtppjpfak4PF_mcppqcdak4PF &
 root -l -q -b histbuild.C\(\"dtppjpfak3PF\",\"mcppqcdak3PF\"\) >out_dtppjpfak3PF_mcppqcdak3PF &
 root -l -q -b histbuild.C\(\"dtppjpfak4Calo\",\"mcppqcdak4Calo\"\) >out_dtppjpfak4Calo_mcppqcdak4Calo &
@@ -21,6 +12,13 @@ root -l -q -b histbuild.C\(\"dtPbj40akVs4PF\",\"mcPbqcdakVs4PF\"\) >out_dtPbj40a
 root -l -q -b histbuild.C\(\"dtPbj40akVs3PF\",\"mcPbqcdakVs3PF\"\) >out_dtPbj40akVs3PF_mcPbqcdakVs3PF &
 root -l -q -b histbuild.C\(\"dtPbj40akVs4Calo\",\"mcPbqcdakVs4Calo\"\) >out_dtPbj40akVs4Calo_mcPbqcdakVs4Calo &
 root -l -q -b histbuild.C\(\"dtPbj40akVs3Calo\",\"mcPbqcdakVs3Calo\"\) >out_dtPbj40akVs3Calo_mcPbqcdakVs3Calo &
+root -l -q -b histbuild.C\(\"dtPbj40akVs4PF\",\"mcPbqp8akVs4PF\"\) >out_dtPbj40akVs4PF_mcPbqp8akVs4PF &
+root -l -q -b histbuild.C\(\"dtPbj40akVs3PF\",\"mcPbqp8akVs3PF\"\) >out_dtPbj40akVs3PF_mcPbqp8akVs3PF &
+root -l -q -b histbuild.C\(\"dtPbj40akVs4Calo\",\"mcPbqp8akVs4Calo\"\) >out_dtPbj40akVs4Calo_mcPbqp8akVs4Calo &
+root -l -q -b histbuild.C\(\"dtPbj40akVs3Calo\",\"mcPbqp8akVs3Calo\"\) >out_dtPbj40akVs3Calo_mcPbqp8akVs3Calo &
+
+
+"
 root -l -q -b histbuild.C\(\"dtPbbjtakPu4PF\",\"mcPbqcdakPu4PF\"\) >out_dtPbbjtakPu4PF_mcPbqcdakPu4PF &
 root -l -q -b histbuild.C\(\"dtPbbjtakPu3PF\",\"mcPbqcdakPu3PF\"\) >out_dtPbbjtakPu3PF_mcPbqcdakPu3PF &
 root -l -q -b histbuild.C\(\"dtPbbjtakPu4Calo\",\"mcPbqcdakPu4Calo\"\) >out_dtPbbjtakPu4Calo_mcPbqcdakPu4Calo &

@@ -113,3 +113,40 @@ TString nicepairname(TString code1, TString code2)
   
   return TString((isPbPb(code1) ? "PbPb_" : "pp_"))+niceSample(getSample(code1))+"_vs_"+niceSample(getSample(code2))+"_"+algo(code1);
 }
+
+TString nicecentralitylabel(TString cbin)
+{
+  if (cbin=="") return "";
+  if (cbin=="0_40") return "0-20%";
+  if (cbin=="80_200") return "40-100%";
+  return cbin;
+}
+
+void PutInCbins(TString outputfolder, TString code, vector<vector<int> > cbins) 
+{ 
+  if (!isPbPb(code)) return;
+  cout<<"Puttin' on the Cbin..."<<endl;
+  for (auto b:cbins) {
+    int low = b[0];
+    int high = b[1];
+
+    cout<<"["<<low<<","<<high<<")"<<endl;
+    
+    TString folder = TString::Format("%s/cbin%d_%d",outputfolder.Data(),low,high);
+    gSystem->MakeDirectory(folder); //returns -1 if exists
+    
+    TFile *fin, *fout;
+    TTree *ntin, *ntout;
+    
+    for (auto suff:{"_djt","_inc","_evt"}) {
+      fin = new TFile(outputfolder+"/"+code+TString(suff)+".root");
+      ntin = (TTree *)fin->Get("nt");
+      fout = new TFile(folder+"/"+code+TString(suff)+".root","recreate");
+      ntout = ntin->CopyTree(Form("bin>=%d && bin<%d",low,high));
+      ntout->Write();
+      fout->Close();
+      fin->Close();
+    }
+  }
+
+}
