@@ -6,9 +6,9 @@ void bkgeffectdraw()
 
 	vector<float> pt1cuts =  {50,70,90,110,130,200};//{60,80,100,120};//{60,70,80,90,100,110,120};//{60,70,100,120};
 
-	vector<TH1F *> meanxj(pt1cuts.size()), meanxjS(pt1cuts.size()), meanxjS2(pt1cuts.size()),meanxjfake(pt1cuts.size()),meanxjfakeB(pt1cuts.size()), meanxjwithfake(pt1cuts.size());
-	vector<TH1F *> signalIs2nd(pt1cuts.size()), signalTotal(pt1cuts.size()), dijetsWithSignal2(pt1cuts.size()), dijetsTotal(pt1cuts.size());
-	vector<TH1F *> f1(pt1cuts.size()), f2(pt1cuts.size()),frSignal(pt1cuts.size()), frB(pt1cuts.size());
+	vector<TH1F *> meanxj, meanxjS, meanxjS2,meanxjfake,meanxjfakeB, meanxjwithfake;
+	vector<TH1F *> signalIs2nd, signalTotal, dijetsWithSignal2, dijetsTotal;
+	vector<TH1F *> f1, f2,frSignal, frB;
 
 	plotlegendpos = TopLeft;
 	plotymin = 0.55;
@@ -17,32 +17,26 @@ void bkgeffectdraw()
 
 
 	for (unsigned i=0;i<pt1cuts.size();i++){
-		meanxj[i] = (TH1F *)f->Get(Form("xjmean_%d",(int)pt1cuts[i]));
-		meanxjS[i] = (TH1F *)f->Get(Form("xjmeanS_%d",(int)pt1cuts[i]));
-		meanxjS2[i] = (TH1F *)f->Get(Form("xjmeanS2_%d",(int)pt1cuts[i]));
-		meanxjfake[i] = (TH1F *)f->Get(Form("xjSignalFakemean_%d",(int)pt1cuts[i]));
-		//meanxjfakeB[i] = (TH1F *)f->Get(Form("xjFakeBmean_%d",(int)pt1cuts[i]));
+		meanxj.push_back((TH1F *)f->Get(Form("xjmean_%d",(int)pt1cuts[i])));
+		meanxjS.push_back((TH1F *)f->Get(Form("xjmeanS_%d",(int)pt1cuts[i])));
+		meanxjS2.push_back((TH1F *)f->Get(Form("xjmeanS2_%d",(int)pt1cuts[i])));
+		meanxjfake.push_back((TH1F *)f->Get(Form("xjSignalFakemean_%d",(int)pt1cuts[i])));
+		//meanxjfakeB.push_back((TH1F *)f->Get(Form("xjFakeBmean_%d",(int)pt1cuts[i])));
+		// signalIs2nd.push_back((TH1F *)f->Get(Form("sSi2nd_%d",(int)pt1cuts[i])));
+		// signalTotal.push_back((TH1F *)f->Get(Form("sSiTot_%d",(int)pt1cuts[i])));
+		// dijetsWithSignal2.push_back((TH1F *)f->Get(Form("dSig_%d",(int)pt1cuts[i])));
+		// dijetsTotal.push_back((TH1F *)f->Get(Form("dTot_%d",(int)pt1cuts[i])));
+		f1.push_back((TH1F *)f->Get(Form("f1_%d",(int)pt1cuts[i])));
+		f2.push_back((TH1F *)f->Get(Form("f2_%d",(int)pt1cuts[i])));
+		frSignal.push_back((TH1F *)f->Get(Form("frSignal_%d",(int)pt1cuts[i])));
+		frB.push_back((TH1F *)f->Get(Form("frB_%d",(int)pt1cuts[i])));
+
+		for (int j=0;j<=frSignal[i]->GetNbinsX();j++)
+			frSignal[i]->SetBinError(j,0);//!!!!!!!!!
+		
 
 
-		// signalIs2nd[i] = (TH1F *)f->Get(Form("sSi2nd_%d",(int)pt1cuts[i]));
-		// signalTotal[i] = (TH1F *)f->Get(Form("sSiTot_%d",(int)pt1cuts[i]));
-		// dijetsWithSignal2[i] = (TH1F *)f->Get(Form("dSig_%d",(int)pt1cuts[i]));
-		// dijetsTotal[i] = (TH1F *)f->Get(Form("dTot_%d",(int)pt1cuts[i]));
-		f1[i] = (TH1F *)f->Get(Form("f1_%d",(int)pt1cuts[i]));
-		f2[i] = (TH1F *)f->Get(Form("f2_%d",(int)pt1cuts[i]));
-		frSignal[i] = (TH1F *)f->Get(Form("frSignal_%d",(int)pt1cuts[i]));
-		frB[i] = (TH1F *)f->Get(Form("frB_%d",(int)pt1cuts[i]));
-
-		for (int j=0;j<=frSignal[i]->GetNbinsX();j++) {
-			//frSignal[i]->SetBinError(j,0);//!!!!!!!!!
-			
-
-			//frSignal[i]->SetBinContent(j,1); to see only fakes
-
-		}
-
-
-		meanxjwithfake[i] = (TH1F *)meanxj[i]->Clone(Form("meanxjwithfake_%d",(int)pt1cuts[i]));
+		meanxjwithfake.push_back((TH1F *)meanxj[i]->Clone(Form("meanxjwithfake_%d",(int)pt1cuts[i])));
 		meanxjwithfake[i]->SetTitle("With fakes; p_{T,2} threshold [GeV]; #LT x_{J} #GT");
 		meanxjwithfake[i]->Reset();
 		auto tmp = (TH1F *)meanxjwithfake[i]->Clone(Form("tmp_%d",(int)pt1cuts[i]));
