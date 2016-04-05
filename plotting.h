@@ -1,4 +1,5 @@
 #include "TH1F.h"
+#include "TH2F.h"
 #include "THStack.h"
 #include "TString.h"
 #include "TFile.h"
@@ -18,14 +19,20 @@
 
 using namespace std;
 
+enum LegendPosition {TopRight, TopLeft, BottomRight, BottomLeft};
+
 int darkred = TColor::GetColorDark(2);
 int darkgreen = TColor::GetColorDark(3);
 int darkblue = TColor::GetColorDark(4);
 int lightblue = TColor::GetColorBright(4);
 
+bool buildFromVector = false;
+vector<float> buildvector;
 int buildnbins = 20;
 float buildxmin = 0;
 float buildxmax = 1;
+vector<TH1F *> allhists;
+
 
 int ccounter = 0;
 TCanvas *getc()
@@ -37,9 +44,41 @@ TCanvas *getc()
 
 }
 
+void buildh(int nbins=20, float xmin=0, float xmax=1)
+{
+  buildFromVector = false;
+  buildnbins = nbins;
+  buildxmin = xmin;
+  buildxmax = xmax;
+}
+
+void buildh(vector<float> &binsvector)
+{
+  buildFromVector = true;
+  buildvector = binsvector;
+}
+
+
 TH1F *geth(TString hname, TString htitle)
 {
-  return new TH1F(hname, htitle, buildnbins, buildxmin, buildxmax);
+  TH1F *h;
+  if (buildFromVector)
+    h = new TH1F(hname, htitle,buildvector.size()-1,&buildvector[0]);
+  else
+    h = new TH1F(hname, htitle, buildnbins, buildxmin, buildxmax);
+  allhists.push_back(h);
+  return h;
+}
+
+TH1F *geth(TString hnametitle)
+{
+  return geth(hnametitle,hnametitle);
+}
+
+void WriteAllHists()
+{
+  for (auto h:allhists)
+    if (h!=0) h->Write();
 }
 
 void fitdphi(TH1F *h, float &sigma, float &error)
@@ -103,8 +142,13 @@ float plotyline = 9999;
 
 //int ccounter = 0;
 bool plotlegend = true;
-bool plotylog = true;
+LegendPosition plotlegendpos = TopRight;
+bool plotylog = false;
 
+float plottextposx = 0.55, plottextposy = 0.79;
+float plotmeanposx = 0.2, plotmeanposy = 0.5;
+
+bool plotoverwritecolors = true;
 
 void Normalize(vector<TH1F *> hists)
 {
@@ -112,34 +156,73 @@ void Normalize(vector<TH1F *> hists)
     h->Scale(1/h->Integral());
 }
 
+TLegend *getLegend()
+{
+  TLegend *l;
+  if (plotlegendpos==TopRight)
+    l = new TLegend(0.48,0.6,0.85,0.8);
+  else if (plotlegendpos==BottomRight)
+    l = new TLegend(0.48,0.2,0.85,0.4);
+  else if (plotlegendpos==TopLeft)
+    l = new TLegend(0.2,0.6,0.55,0.8);
+  else //if (plotlegendpos==BottomLeft)
+    l = new TLegend(0.2,0.2,0.55,0.4);
 
-TCanvas *Draw(vector<TH1F *> hists,TString options = "")
+  //l->SetTextSize(20);
+
+  return l;
+}
+
+TCanvas *Draw(vector<TH1F *> hists,TString options = "E1")
 {
   ccounter++;
   TCanvas *c= new TCanvas(Form("%d",ccounter),Form("%d",ccounter),600,600);
-  TLegend *l = new TLegend(0.5,0.6,0.85,0.8);
+
+  TLegend *l = getLegend();
+
   TLatex *Tl = new TLatex();
+
+
+
   int i=0;
 
-   TString filename = "Draw_";
+  TString filename = "Draw_";
 
   for(auto h:hists) {
     filename+=h->GetName();
-    h->SetMarkerColor(TColor::GetColorDark(i+2));
-    h->SetLineColor(TColor::GetColorDark(i+2));
+    if (plotoverwritecolors) {
+      h->SetMarkerColor(TColor::GetColorDark(i+2));
+      h->SetLineColor(TColor::GetColorDark(i+2));
+    }
     l->AddEntry(h,h->GetTitle(),"P");
     if (i==0) {
       if (plotymax!=9999) h->SetMaximum(plotymax);
+      if (plotymin!=9999) h->SetMinimum(plotymin);
+
       h->Draw(options);
     } else h->Draw(options+"same");
     i++;
     cout<<h->GetTitle()<<" : "<<h->GetEffectiveEntries()<<"("<<h->GetEntries()<<")"<<
       "mean : "<<h->GetMean()<<"±"<<h->GetMeanError()<<endl;
-    if (plotputmean)
-      Tl->DrawLatexNDC(0.2, 0.7-i*0.07, Form("%.3f#pm%.3f",h->GetMean(),h->GetMeanError()));
+    if (plotputmean) {
+      Tl->DrawLatexNDC(plotmeanposx, plotmeanposy-i*0.07, Form("%.3f#pm%.3f",h->GetMean(),h->GetMeanError()));
+      TLine *l = new TLine(h->GetMean(),h->GetMinimum(),h->GetMean(),h->GetMaximum());
+      l->SetLineColor(h->GetLineColor());
+      l->SetLineWidth(2);
+      l->Draw();
+
+    }
 
   }
   cout<<endl;
+
+ Tl->DrawLatexNDC(plottextposx, plottextposy, aktstring);
+ if (plotsecondline!="")
+   Tl->DrawLatexNDC(plottextposx, plottextposy-0.075,plotsecondline);
+ if (plotthirdline!="")
+   Tl->DrawLatexNDC(plottextposx, plottextposy-0.15,plotthirdline);
+
+
   if (plotlegend)
     l->Draw();
   if (plotylog)
@@ -152,11 +235,19 @@ TCanvas *Draw(vector<TH1F *> hists,TString options = "")
 
 }
 
+void Print(TH1F *h)
+{
+    cout<<"Histogram "<<h->GetName()<<" : "<<h->GetTitle()<<endl;
+  for (int i=1;i<=h->GetNbinsX();i++)
+    cout<<"   "<<i<<" : "<<h->GetBinContent(i)<<" ± "<<h->GetBinError(i)<<endl;
+}
+
+
 map<TString, TString> histToStyle;
 
 TString legendoption(TString drawoption)
 {
-  if (drawoption=="hist") return "L";
+  if (drawoption.Contains("hist")) return "L";
   else return "P";
 }
 
@@ -355,8 +446,15 @@ void DrawCompare(TH1F *h1, TH1F *h2, TString caption = "x_{J}",TH1F *h11=0)
   c1->cd();
 
   TString h11title = h11==0?"":h11->GetTitle();
+  TString outname = TString::Format("Compare%s_%s_%s%s%s",plottitle.Data(),h1->GetTitle(),h2->GetTitle(),h11title.Data(),plotfilenameend.Data());//Form("Compare_%s_%s_%s.pdf",title.Data(), legend1.Data(), legend2.Data()));
 
-  c1->SaveAs(Form("%s/Compare%s_%s_%s%s%s.pdf",plotsfolder.Data(),plottitle.Data(),h1->GetTitle(),h2->GetTitle(),h11title.Data(),plotfilenameend.Data()));//Form("Compare_%s_%s_%s.pdf",title.Data(), legend1.Data(), legend2.Data()));
+  outname.ReplaceAll(" ","_");
+
+  c1->SetName(outname);
+
+  c1->SaveAs(Form("%s/%s.pdf",plotsfolder.Data(),outname.Data()));
+  c1->SaveAs(Form("%s/%s.C",plotsfolder.Data(),outname.Data()));
+
 
 }
 
@@ -733,16 +831,26 @@ TCanvas * DrawStack(THStack *h, TH1F *hontop, TString xtitle, TString ytitle, fl
   return c2;
 }
 
+//awful...
+TString getWithoutSuffix(TString s)
+{
+  if (s[s.Length()-1]==')' && s[s.Length()-3]=='(')
+    return TString(s(0,s.Length()-3));
 
-THStack *stackhists(vector<TH1F *>hists, vector<int> color, TString name)
+  return s;
+}
+
+THStack *stackhists(vector<TH1F *>hists, vector<int> color, TString name, TString suffix = "")
 {
   THStack *hs = new THStack(name,name);
   int N = hists.size();
   for (int i=0;i<N;i++) {
+  //for (int i=N-1;i>=0;i--) {
     hists[i]->SetFillColor(color[i]);
     hists[i]->SetLineColor(color[i]);
     hists[i]->SetMarkerColor(color[i]);
     hists[i]->SetFillStyle(1001);
+    hists[i]->SetTitle(getWithoutSuffix(hists[i]->GetTitle())+suffix);
 
     hs->Add(hists[i],"hist");
   }
@@ -804,8 +912,8 @@ void DrawCompare(TH1F *h1, THStack *hstack, TString caption = "x_{J}",TString st
   // }else
   //   l->AddEntry(hstack, "", "F");
   
-  for (auto h:hhh)
-    l->AddEntry(h,h->GetTitle(),"F");
+  for (int i=hhh.size()-1;i>=0;i--)
+    l->AddEntry(hhh[i],hhh[i]->GetTitle(),"F");
 
 
   // float ymax = plotylog ? pow(max(h1->GetMaximum(), h2->GetMaximum()), 1.3) : max(h1->GetMaximum(), h2->GetMaximum()) * 1.3;
@@ -849,6 +957,7 @@ void DrawCompare(TH1F *h1, THStack *hstack, TString caption = "x_{J}",TString st
   h2->GetYaxis()->SetTitle(title);
   h2->GetXaxis()->SetLabelSize(0);
 
+
   h1->SetMarkerColor(color1);
   h1->SetLineColor(color1);
   //  h2->SetMarkerColor(color2);
@@ -858,6 +967,9 @@ void DrawCompare(TH1F *h1, THStack *hstack, TString caption = "x_{J}",TString st
 
   hstack->Draw("hist");
   h1->Draw("P,same");
+
+
+  hstack->GetXaxis()->SetLabelSize(0);
 
   //h2->Draw();
   l->Draw();

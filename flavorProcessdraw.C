@@ -3,8 +3,7 @@ void flavorProcessdraw()
 {
 
 	auto f = new TFile("flavorProcesshists_mc.root");
-	auto h12dt = (TH1F *)f->Get("h12dt");
-	auto h12mc = (TH1F *)f->Get("h12mc");
+	auto h12all = (TH1F *)f->Get("h12all");
 	auto h12fcr = (TH1F *)f->Get("h12fcr");
 	auto h12fex = (TH1F *)f->Get("h12fex");
 	auto h12gsp = (TH1F *)f->Get("h12gsp");

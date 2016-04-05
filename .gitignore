@@ -34,3 +34,6 @@
 *.root
 plots_*
 *~
+
+*_C.d
+*.pcm

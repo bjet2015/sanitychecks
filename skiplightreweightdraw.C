@@ -3,8 +3,8 @@
 
 void skiplightreweightdraw()
 {
-	float beta = 0.28;//0.2;//0.04;
-	float gamma = 1.24;//1.08;//1.2;
+	float beta  = 0.045;//110/50 = 0.28;//FEXGSP = 0.4
+	float gamma = 1.182;//110/50 = 1.24;//FEXGSP = 0.4
 
 	auto f= new TFile("skiplightreweight.root");
 	auto h12all = (TH1F *)f->Get("h12all");
@@ -130,34 +130,39 @@ void skiplightreweightdraw()
 
 	plotfilenameend = "";
 
-	vector<int> colors = {TColor::GetColor("#FA7200"),
-						  TColor::GetColor("#9ACD32"),
-						  TColor::GetColor("#0D98BA")};//{kGreen-9, kOrange+1,kBlue+3};
+	// vector<int> colors = {TColor::GetColor("#FA7200"),
+	// 					  TColor::GetColor("#9ACD32"),
+	// 					  TColor::GetColor("#0D98BA")};//{kGreen-9, kOrange+1,kBlue+3};
 
-	auto h12stack = stackhists({h12fcr,h12fex,h12gsp},colors,"h12stack");
+	vector<int> colors = {TColor::GetColor(25,87,5),//18,58,5),
+						  TColor::GetColor(255,109,24),//234,117,1),//255,117,24),
+						  TColor::GetColor(77,135,232)};//{kGreen-9, kOrange+1,kBlue+3};
+
+
+	auto h12stack = stackhists({h12fcr,h12fex,h12gsp},colors,"h12stack","(P)");
 	DrawCompare(h12data,h12stack,"x_{J}");
 
 
 	h12fex->Scale(beta); h12gsp->Scale(gamma);
-	auto h12stack2 = stackhists({h12fcr,h12fex,h12gsp},colors,"h12stack2");
+	auto h12stack2 = stackhists({h12fcr,h12fex,h12gsp},colors,"h12stack2","(W)");
 	DrawCompare(h12data,h12stack2,"x_{J}");
 
 
-	auto hSLstack = stackhists({hSLfcr,hSLfex,hSLgsp},colors,"hSLstack");
-	DrawCompare(hSLdata,hSLstack,"x_{J}","fuckoff");
+	auto hSLstack = stackhists({hSLfcr,hSLfex,hSLgsp},colors,"hSLstack","(P)");
+	DrawCompare(hSLdata,hSLstack,"x_{J}");
 
 
 	hSLfex->Scale(beta); hSLgsp->Scale(gamma);
-	auto hSLstack2 = stackhists({hSLfcr,hSLfex,hSLgsp},colors,"hSLstack2");
-	DrawCompare(hSLdata,hSLstack2,"x_{J}","fuckoff");
+	auto hSLstack2 = stackhists({hSLfcr,hSLfex,hSLgsp},colors,"hSLstack2","(W)");
+	DrawCompare(hSLdata,hSLstack2,"x_{J}");
 
 
 
 
 
 	plotputmean = false;
-	plotylog = true;
-	plotymax = 2;
+	plotylog = false;
+	plotymax = 1.1;
 	plotymin = 1E-5;
 
 
@@ -167,21 +172,21 @@ void skiplightreweightdraw()
 	DrawCompare(h12orddata,h12ordreweighted);
 	DrawCompare(hSLorddata,hSLordreweighted);
 
-	auto h12ordstack = stackhists({h12ordfcr,h12ordfex,h12ordgsp},colors,"h12ordstack");
+	auto h12ordstack = stackhists({h12ordfcr,h12ordfex,h12ordgsp},colors,"h12ordstack","(P)");
 	DrawCompare(h12orddata,h12ordstack,"skiplight order");
 
 
 	h12ordfex->Scale(beta); h12ordgsp->Scale(gamma);
-	auto h12ordstack2 = stackhists({h12ordfcr,h12ordfex,h12ordgsp},colors,"h12ordstack2");
+	auto h12ordstack2 = stackhists({h12ordfcr,h12ordfex,h12ordgsp},colors,"h12ordstack2","(W)");
 	DrawCompare(h12orddata,h12ordstack2,"skiplight order");
 
 
-	auto hSLordstack = stackhists({hSLordfcr,hSLordfex,hSLordgsp},colors,"hSLordstack");
+	auto hSLordstack = stackhists({hSLordfcr,hSLordfex,hSLordgsp},colors,"hSLordstack","(P)");
 	DrawCompare(hSLorddata,hSLordstack,"skiplight order");
 
 
 	hSLordfex->Scale(beta); hSLordgsp->Scale(gamma);
-	auto hSLordstack2 = stackhists({hSLordfcr,hSLordfex,hSLordgsp},colors,"hSLordstack2");
+	auto hSLordstack2 = stackhists({hSLordfcr,hSLordfex,hSLordgsp},colors,"hSLordstack2","(W)");
 	DrawCompare(hSLorddata,hSLordstack2,"skiplight order");
 
 
@@ -196,35 +201,37 @@ void skiplightreweightdraw()
 	plotymax = 0.5;
 	plotthirdline  = "CSV>0.9";
 
-	DrawCompare(h12dphidata,h12dphiall);
-	DrawCompare(hSLdphidata,hSLdphiall);
+	DrawCompare(h12dphidata,h12dphiall,"#Delta#phi");
+	DrawCompare(hSLdphidata,hSLdphiall,"#Delta#phi");
 
 
 	Normalize({hSLdphireweighted,h12dphireweighted});
 	SetMC({hSLdphireweighted,h12dphireweighted});
 
-	DrawCompare(h12dphidata,h12dphireweighted);
-	DrawCompare(hSLdphidata,hSLdphireweighted);
+	DrawCompare(h12dphidata,h12dphireweighted,"#Delta#phi");
+	DrawCompare(hSLdphidata,hSLdphireweighted,"#Delta#phi");
 
-	plotymax = 0.12;
+	//plotymax = 0.5;
 
-	auto h12dphistack = stackhists({h12dphifcr,h12dphifex,h12dphigsp},colors,"h12dphistack");
+	auto h12dphistack = stackhists({h12dphifcr,h12dphifex,h12dphigsp},colors,"h12dphistack","(P)");
 	DrawCompare(h12dphidata,h12dphistack,"#Delta#phi");
 
 	h12dphifex->Scale(beta); h12dphigsp->Scale(gamma);
-	auto h12dphistack2 = stackhists({h12dphifcr,h12dphifex,h12dphigsp},colors,"h12dphistack2");
+	auto h12dphistack2 = stackhists({h12dphifcr,h12dphifex,h12dphigsp},colors,"h12dphistack2","(W)");
 	DrawCompare(h12dphidata,h12dphistack2,"#Delta#phi");
 
 
-	auto hSLdphistack = stackhists({hSLdphifcr,hSLdphifex,hSLdphigsp},colors,"hSLdphistack");
+	auto hSLdphistack = stackhists({hSLdphifcr,hSLdphifex,hSLdphigsp},colors,"hSLdphistack","(P)");
 	DrawCompare(hSLdphidata,hSLdphistack,"#Delta#phi");
 
 	hSLdphifex->Scale(beta); hSLdphigsp->Scale(gamma);
-	auto hSLdphistack2 = stackhists({hSLdphifcr,hSLdphifex,hSLdphigsp},colors,"hSLdphistack2");
+	auto hSLdphistack2 = stackhists({hSLdphifcr,hSLdphifex,hSLdphigsp},colors,"hSLdphistack2","(W)");
 	DrawCompare(hSLdphidata,hSLdphistack2,"#Delta#phi");
 
 
 
+	plotylog = false;
+	plotymax = 0.25;
 //only interesting dphi region
 	DrawCompare(h12dphiNSdata,h12dphiNSall);
 	DrawCompare(hSLdphiNSdata,hSLdphiNSall);
@@ -238,19 +245,19 @@ void skiplightreweightdraw()
 
 
 
-	auto h12dphiNSstack = stackhists({h12dphiNSfcr,h12dphiNSfex,h12dphiNSgsp},colors,"h12dphiNSstack");
+	auto h12dphiNSstack = stackhists({h12dphiNSfcr,h12dphiNSfex,h12dphiNSgsp},colors,"h12dphiNSstack","(P)");
 	DrawCompare(h12dphiNSdata,h12dphiNSstack,"#Delta#phi");
 
 	h12dphiNSfex->Scale(beta); h12dphiNSgsp->Scale(gamma);
-	auto h12dphiNSstack2 = stackhists({h12dphiNSfcr,h12dphiNSfex,h12dphiNSgsp},colors,"h12dphiNSstack2");
+	auto h12dphiNSstack2 = stackhists({h12dphiNSfcr,h12dphiNSfex,h12dphiNSgsp},colors,"h12dphiNSstack2","(W)");
 	DrawCompare(h12dphiNSdata,h12dphiNSstack2,"#Delta#phi");
 
 
-	auto hSLdphiNSstack = stackhists({hSLdphiNSfcr,hSLdphiNSfex,hSLdphiNSgsp},colors,"hSLdphiNSstack");
+	auto hSLdphiNSstack = stackhists({hSLdphiNSfcr,hSLdphiNSfex,hSLdphiNSgsp},colors,"hSLdphiNSstack","(P)");
 	DrawCompare(hSLdphiNSdata,hSLdphiNSstack,"#Delta#phi");
 
 	hSLdphiNSfex->Scale(beta); hSLdphiNSgsp->Scale(gamma);
-	auto hSLdphiNSstack2 = stackhists({hSLdphiNSfcr,hSLdphiNSfex,hSLdphiNSgsp},colors,"hSLdphiNSstack2");
+	auto hSLdphiNSstack2 = stackhists({hSLdphiNSfcr,hSLdphiNSfex,hSLdphiNSgsp},colors,"hSLdphiNSstack2","(W)");
 	DrawCompare(hSLdphiNSdata,hSLdphiNSstack2,"#Delta#phi");
 
 

@@ -97,7 +97,21 @@ void histdraw(TString dtsample, TString mcsample, TString cbin)
   if (isPbPb(dtsample)) {
     centrdt = (TH1F *)f->Get("centrdt");
     centrmc = (TH1F *)f->Get("centrmc");
+    SetMC({centrmc}); SetInc({centrmc});
+    SetData({centrdt});
+
   }
+
+  auto vdt = (TH1F *)f->Get("vdt");
+  auto vmc = (TH1F *)f->Get("vmc");
+  auto vdt0 = (TH1F *)f->Get("vdt0");
+  auto vmc0 = (TH1F *)f->Get("vmc0");
+
+  SetMC({vmc, vmc0});
+  SetData({vdt,vdt0});
+  SetInc({vmc, vmc0});
+
+
 
   auto inc_mcpthat = (TH1F *)f->Get("inc_mcpthat");
     //  auto dj_mcpthat = (TH1F *)f->Get("dj_mcpthat");
@@ -110,8 +124,8 @@ void histdraw(TString dtsample, TString mcsample, TString cbin)
   auto datarawpt = (TH1F *)f->Get("data_rawpt");
   auto inc_rawpt = (TH1F *)f->Get("inc_rawpt");
 
-  auto datajtpt1 = (TH1F *)f->Get("data_jtpt1");
-  auto mcjtpt1 = (TH1F *)f->Get("mc_jtpt1");
+  auto datajtpt2 = (TH1F *)f->Get("data_jtpt2");
+  auto mcjtpt2 = (TH1F *)f->Get("mc_jtpt2");
 
   auto inc_JES = (TH1F *)f->Get("inc_JES");
   auto inc_JER = (TH1F *)f->Get("inc_JER");
@@ -121,14 +135,14 @@ void histdraw(TString dtsample, TString mcsample, TString cbin)
   auto inc_jteta = (TH1F *)f->Get("inc_jteta");
   auto datajteta = (TH1F *)f->Get("data_jteta");
   
-  auto dj_jtpt0 = (TH1F *)f->Get("dj_jtpt0");
+  auto dj_jtpt1 = (TH1F *)f->Get("dj_jtpt1");
   auto mc_aj = (TH1F *)f->Get("mc_aj");
   auto mc_btgaj = (TH1F *)f->Get("mc_btgaj");
   auto mc_xj = (TH1F *)f->Get("mc_xj");
   auto mc_dphi = (TH1F *)f->Get("mc_dphi");
   auto mc_dphi2 = (TH1F *)f->Get("mc_dphi2");
   auto mc_btgdphi = (TH1F *)f->Get("mc_btgdphi");
-  auto data_jtpt0 = (TH1F *)f->Get("data_jtpt0");
+  auto data_jtpt1 = (TH1F *)f->Get("data_jtpt1");
   auto data_aj = (TH1F *)f->Get("data_aj");
   auto data_btgaj = (TH1F *)f->Get("data_btgaj");
   auto data_xj = (TH1F *)f->Get("data_xj");
@@ -137,7 +151,7 @@ void histdraw(TString dtsample, TString mcsample, TString cbin)
   auto data_btgdphi = (TH1F *)f->Get("data_btgdphi");
 
   divdatabybw({datajtpt,datarawpt,datajtphi,
-	datajteta,dj_jtpt0,datajtpt1, data_jtpt0});
+	datajteta,dj_jtpt1,datajtpt2, data_jtpt1});
 
   normalize({data_aj,data_xj,data_dphi,data_dphi2,data_btgaj, data_btgdphi});
 
@@ -145,14 +159,14 @@ void histdraw(TString dtsample, TString mcsample, TString cbin)
   normmctodata(datajtpt, inc_jtpt);
   normmctodata(datajtphi, inc_jtphi);
   normmctodata(datajteta, inc_jteta);
-  normmctodata(data_jtpt0, dj_jtpt0);
+  normmctodata(data_jtpt1, dj_jtpt1);
   normmctodata(data_aj, mc_aj);
   normmctodata(data_btgaj, mc_btgaj);
   normmctodata(data_xj, mc_xj);
   normmctodata(data_dphi, mc_dphi);
   normmctodata(data_dphi2, mc_dphi2);
   normmctodata(data_btgdphi, mc_btgdphi);
-  normmctodata(datajtpt1, mcjtpt1);
+  normmctodata(datajtpt2, mcjtpt2);
 
   
   for (int i=0;i<100;i++)
@@ -185,6 +199,9 @@ void histdraw(TString dtsample, TString mcsample, TString cbin)
     DrawCompare(centrdt, centrmc, false,"centrality bin");
   }
 
+  DrawCompare(vdt, vmc, false,"vz [cm]", seta+" "+sdphi,spt2pt1);
+  DrawCompare(vdt0, vmc0, false,"vz [cm]",seta+" "+sdphi,spt2pt1);
+
   DrawCompare(datarawpt, inc_rawpt, true,"inclusive raw p_{T} [GeV/c]", seta);
   DrawCompare(datajtpt, inc_jtpt, true,"inclusive jet p_{T} [GeV/c]", seta);
   plotylog = false;
@@ -192,8 +209,8 @@ void histdraw(TString dtsample, TString mcsample, TString cbin)
   DrawCompare(datajteta, inc_jteta,false,"inclusive jet #eta", spt);
   
   
-  //  DrawCompare(data_jtpt0,dj_jtpt0,true,datacaption, mccaption,"leading jet p_{T} [GeV/c]", true, seta)
-  DrawCompare(datajtpt1,mcjtpt1,false,"subleading jet p_{T} [GeV/c]", seta, spt);
+  //  DrawCompare(data_jtpt1,dj_jtpt1,true,datacaption, mccaption,"leading jet p_{T} [GeV/c]", true, seta)
+  DrawCompare(datajtpt2,mcjtpt2,false,"subleading jet p_{T} [GeV/c]", seta, spt);
   plotputmean = true;
   plotytitle = "Event fractions";
   DrawCompare(data_aj,mc_aj,false,"A_{J}", seta+" "+sdphi,spt2pt1);

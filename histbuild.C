@@ -161,38 +161,38 @@ void checkdatadj(TString datafilename, TString djfilename)
 {
   TFile *f = new TFile(datafilename);
   auto nt = (TTree *)f->Get("nt");
-  auto hjtpt0 = new TH1F("data_jtpt0","data_jtpt0",ptbins,ptmin,ptmax);
-  nt->Project(hjtpt0->GetName(),"jtpt0","weight");
-  auto hjtpt1 = new TH1F("data_jtpt1","data_jtpt1",ptbins,0,200);
-  nt->Project(hjtpt1->GetName(),"jtpt1","weight*(dijet && jtpt0>120 && jtpt1>30 && acos(cos(jtphi0-jtphi1))>2./3*3.14)");
+  auto hjtpt1 = new TH1F("data_jtpt1","data_jtpt1",ptbins,ptmin,ptmax);
+  nt->Project(hjtpt1->GetName(),"jtpt1","weight");
+  auto hjtpt2 = new TH1F("data_jtpt2","data_jtpt2",ptbins,0,200);
+  nt->Project(hjtpt2->GetName(),"jtpt2","weight*(dijet && jtpt1>120 && jtpt2>30 && acos(cos(jtphi1-jtphi2))>2./3*3.14)");
   auto hdataaj = new TH1F("data_aj","data_aj",20,0,1);
-  nt->Project(hdataaj->GetName(),"abs(jtpt0-jtpt1)/(jtpt0+jtpt1)",
-              "weight*(dijet && jtpt0>120 && jtpt1>30 && acos(cos(jtphi0-jtphi1))>2./3*3.14)");
+  nt->Project(hdataaj->GetName(),"abs(jtpt1-jtpt2)/(jtpt1+jtpt2)",
+              "weight*(dijet && jtpt1>120 && jtpt2>30 && acos(cos(jtphi1-jtphi2))>2./3*3.14)");
   auto hdatabtgaj = new TH1F("data_btgaj","data_btgaj",20,0,1);
-  nt->Project(hdatabtgaj->GetName(),"abs(jtpt0-jtpt1)/(jtpt0+jtpt1)",
-	      "weight*(dijet && jtpt0>120 && jtpt1>30 && acos(cos(jtphi0-jtphi1))>2./3*3.14 && discr_csvSimple0>0.9 && discr_csvSimple1>0.9)");
+  nt->Project(hdatabtgaj->GetName(),"abs(jtpt1-jtpt2)/(jtpt1+jtpt2)",
+	      "weight*(dijet && jtpt1>120 && jtpt2>30 && acos(cos(jtphi1-jtphi2))>2./3*3.14 && discr_csvSimple1>0.9 && discr_csvSimple2>0.9)");
 
   auto hdataxj = new TH1F("data_xj","data_xj",20,0,1);
-  nt->Project(hdataxj->GetName(),"jtpt1/jtpt0",
-              "weight*(dijet && jtpt0>120 && jtpt1>30 && acos(cos(jtphi0-jtphi1))>2./3*3.14)");
+  nt->Project(hdataxj->GetName(),"jtpt2/jtpt1",
+              "weight*(dijet && jtpt1>120 && jtpt2>30 && acos(cos(jtphi1-jtphi2))>2./3*3.14)");
   auto hdatadphi = new TH1F("data_dphi","data_dphi",20,0,3.142);
-  nt->Project(hdatadphi->GetName(),"acos(cos(jtphi0-jtphi1))",
-              "weight*(dijet && jtpt0>120 && jtpt1>30)");
+  nt->Project(hdatadphi->GetName(),"acos(cos(jtphi1-jtphi2))",
+              "weight*(dijet && jtpt1>120 && jtpt2>30)");
   auto hdatadphi2 = new TH1F("data_dphi2","data_dphi2",20,2,3.142);
-  nt->Project(hdatadphi2->GetName(),"acos(cos(jtphi0-jtphi1))",
-              "weight*(dijet && jtpt0>120 && jtpt1>30)");
+  nt->Project(hdatadphi2->GetName(),"acos(cos(jtphi1-jtphi2))",
+              "weight*(dijet && jtpt1>120 && jtpt2>30)");
   auto hdatabtgdphi = new TH1F("data_btgdphi","data_btgdphi",20,0,3.142);
-  nt->Project(hdatabtgdphi->GetName(),"acos(cos(jtphi0-jtphi1))",
-              "weight*(dijet && jtpt0>120 && jtpt1>30 && discr_csvSimple0>0.9 && discr_csvSimple1>0.9)");
+  nt->Project(hdatabtgdphi->GetName(),"acos(cos(jtphi1-jtphi2))",
+              "weight*(dijet && jtpt1>120 && jtpt2>30 && discr_csvSimple1>0.9 && discr_csvSimple2>0.9)");
 
 
-  SetData({hjtpt0,hjtpt1,hdataaj,hdatabtgaj,hdataxj,hdatadphi,hdatadphi2,hdatabtgdphi});
+  SetData({hjtpt1,hjtpt2,hdataaj,hdatabtgaj,hdataxj,hdatadphi,hdatadphi2,hdatabtgdphi});
   SetB({hdatabtgaj,hdatabtgdphi});
 
 
   fout->cd();
-  hjtpt0->Write();
   hjtpt1->Write();
+  hjtpt2->Write();
   hdataaj->Write();
   hdataxj->Write();
   hdatadphi->Write();
@@ -203,31 +203,31 @@ void checkdatadj(TString datafilename, TString djfilename)
 
   f = new TFile(djfilename);
   nt = (TTree *)f->Get("nt");
-  auto hdjjtpt0 = new TH1F("dj_jtpt0","dj_jtpt0",ptbins,ptmin,ptmax);
-  nt->Project(hdjjtpt0->GetName(),"jtpt0","weight");
-  auto hmcjtpt1 = new TH1F("mc_jtpt1","mc_jtpt1",ptbins,0,200);
-  nt->Project(hmcjtpt1->GetName(),"jtpt1","weight*(dijet && jtpt0>120 && jtpt1>30 && acos(cos(jtphi0-jtphi1))>2./3*3.14)");
+  auto hdjjtpt1 = new TH1F("dj_jtpt1","dj_jtpt1",ptbins,ptmin,ptmax);
+  nt->Project(hdjjtpt1->GetName(),"jtpt1","weight");
+  auto hmcjtpt2 = new TH1F("mc_jtpt2","mc_jtpt2",ptbins,0,200);
+  nt->Project(hmcjtpt2->GetName(),"jtpt2","weight*(dijet && jtpt1>120 && jtpt2>30 && acos(cos(jtphi1-jtphi2))>2./3*3.14)");
   auto hmcaj = new TH1F("mc_aj","mc_aj",20,0,1);
-  nt->Project(hmcaj->GetName(),"abs(jtpt0-jtpt1)/(jtpt0+jtpt1)",
-              "weight*(dijet && jtpt0>120 && jtpt1>30 && acos(cos(jtphi0-jtphi1))>2./3*3.14)");
+  nt->Project(hmcaj->GetName(),"abs(jtpt1-jtpt2)/(jtpt1+jtpt2)",
+              "weight*(dijet && jtpt1>120 && jtpt2>30 && acos(cos(jtphi1-jtphi2))>2./3*3.14)");
   auto hmcbtgaj = new TH1F("mc_btgaj","mc_btgaj",20,0,1);
-  nt->Project(hmcbtgaj->GetName(),"abs(jtpt0-jtpt1)/(jtpt0+jtpt1)",
-              "weight*(dijet && jtpt0>120 && jtpt1>30 && acos(cos(jtphi0-jtphi1))>2./3*3.14 && discr_csvSimple0>0.9 && discr_csvSimple1>0.9)");
+  nt->Project(hmcbtgaj->GetName(),"abs(jtpt1-jtpt2)/(jtpt1+jtpt2)",
+              "weight*(dijet && jtpt1>120 && jtpt2>30 && acos(cos(jtphi1-jtphi2))>2./3*3.14 && discr_csvSimple1>0.9 && discr_csvSimple2>0.9)");
   auto hmcxj = new TH1F("mc_xj","mc_xj",20,0,1);
-  nt->Project(hmcxj->GetName(),"jtpt1/jtpt0",
-              "weight*(dijet && jtpt0>120 && jtpt1>30 && acos(cos(jtphi0-jtphi1))>2./3*3.14)");
+  nt->Project(hmcxj->GetName(),"jtpt2/jtpt1",
+              "weight*(dijet && jtpt1>120 && jtpt2>30 && acos(cos(jtphi1-jtphi2))>2./3*3.14)");
   auto hmcdphi = new TH1F("mc_dphi","mc_dphi",20,0,3.142);
-  nt->Project(hmcdphi->GetName(),"acos(cos(jtphi0-jtphi1))",
-              "weight*(dijet && jtpt0>120 && jtpt1>30)");
+  nt->Project(hmcdphi->GetName(),"acos(cos(jtphi1-jtphi2))",
+              "weight*(dijet && jtpt1>120 && jtpt2>30)");
   auto hmcdphi2 = new TH1F("mc_dphi2","mc_dphi2",20,2,3.142);
-  nt->Project(hmcdphi2->GetName(),"acos(cos(jtphi0-jtphi1))",
-              "weight*(dijet && jtpt0>120 && jtpt1>30)");
+  nt->Project(hmcdphi2->GetName(),"acos(cos(jtphi1-jtphi2))",
+              "weight*(dijet && jtpt1>120 && jtpt2>30)");
   auto hmcbtgdphi = new TH1F("mc_btgdphi","mc_btgdphi",20,0,3.142);
-  nt->Project(hmcbtgdphi->GetName(),"acos(cos(jtphi0-jtphi1))",
-              "weight*(dijet && jtpt0>120 && jtpt1>30 && discr_csvSimple0>0.9 && discr_csvSimple1>0.9)");
+  nt->Project(hmcbtgdphi->GetName(),"acos(cos(jtphi1-jtphi2))",
+              "weight*(dijet && jtpt1>120 && jtpt2>30 && discr_csvSimple1>0.9 && discr_csvSimple2>0.9)");
 
-  SetMC({hdjjtpt0,hmcjtpt1,hmcaj,hmcbtgaj,hmcxj,hmcdphi,hmcdphi2,hmcbtgdphi});
-  SetInc({hdjjtpt0,hmcjtpt1,hmcaj,hmcxj,hmcdphi,hmcdphi2});
+  SetMC({hdjjtpt1,hmcjtpt2,hmcaj,hmcbtgaj,hmcxj,hmcdphi,hmcdphi2,hmcbtgdphi});
+  SetInc({hdjjtpt1,hmcjtpt2,hmcaj,hmcxj,hmcdphi,hmcdphi2});
   SetB({hmcbtgaj,hmcbtgdphi});
 
   auto temp = new TH1F("temp","temp",10,0.5,1.5);
@@ -239,8 +239,8 @@ void checkdatadj(TString datafilename, TString djfilename)
   //hmcdphi->Scale(1./numberofdijets);
 
   fout->cd();
-  hdjjtpt0->Write();
-  hmcjtpt1->Write();
+  hdjjtpt1->Write();
+  hmcjtpt2->Write();
   hmcaj->Write();
   hmcxj->Write();
   hmcdphi->Write();
@@ -282,16 +282,16 @@ void checkbjetdatatrig(TString filename)
   auto nt = (TTree *)f->Get("nt");
 
   auto h = geth("incdatajtpt",48,0,120);
-  nt->Project(h->GetName(),"jtpt0","weight");
+  nt->Project(h->GetName(),"jtpt1","weight");
 
   auto h2 = geth("incdatajtpt60",48,0,120);
-  nt->Project(h2->GetName(),"jtpt0","weight*(hltCSV60)");
+  nt->Project(h2->GetName(),"jtpt1","weight*(hltCSV60)");
 
   auto hr = geth("incdatajtpt60ratio",48,0,120);
   hr->Divide(h2,h);
 
   vector<TString> trigcuts = {"hltCSV80", "hltCSV60 && !hltCSV80"};
-  auto hs = getstack(nt, "trigcomb","jtpt0",trigcuts, 72, 0, 180);
+  auto hs = getstack(nt, "trigcomb","jtpt1",trigcuts, 72, 0, 180);
 
   fout->cd();
   h->Write();
@@ -308,15 +308,15 @@ void checkcentrality(TString datafilename, TString mcfilename)
   auto tdt = (TTree *)fdt->Get("nt");
   auto tmc = (TTree *)fmc->Get("nt");
 
-  auto hdt = new TH1F("centrdt","centrdt",200,0,200); hdt->SetMarkerColor(kBlack);
-  auto hmc = new TH1F("centrmc","centrmc",200,0,200); hmc->SetMarkerColor(kBlue);
+  auto hdt = new TH1F("centrdt","centrdt",50,0,200); hdt->SetMarkerColor(kBlack);
+  auto hmc = new TH1F("centrmc","centrmc",50,0,200); hmc->SetMarkerColor(kBlue);
 
   SetMC({hmc}); SetInc({hmc});
   SetData({hdt});
 
 
-  tdt->Project("centrdt","bin","weight*(jtpt0>120 && jtpt1>30)");
-  tmc->Project("centrmc","bin","weight*(jtpt0>120 && jtpt1>30)");
+  tdt->Project("centrdt","bin","weight*(jtpt1>120 && jtpt2>30 && dphi21>2. && hiHF<5500)");
+  tmc->Project("centrmc","bin","weight*(jtpt1>120 && jtpt2>30 && dphi21>2. && pthatsample>30)");
 
   hmc->Scale(hdt->Integral()/hmc->Integral());
 
@@ -328,6 +328,49 @@ void checkcentrality(TString datafilename, TString mcfilename)
 
 }
 
+void checkvertex(TString datafilename, TString mcfilename)
+{
+
+  TFile *fmc = new TFile(mcfilename);
+  auto ntmc = (TTree *)fmc->Get("nt");
+  TFile *fdt = new TFile(datafilename);
+  auto ntdt = (TTree *)fdt->Get("nt");
+
+  auto vdt0 = new TH1F("vdt0","Data no weighting",30,-15,15); vdt0->Sumw2();
+  auto vmc0 = new TH1F("vmc0","MC no weighting",30,-15,15); vmc0->Sumw2();
+
+  ntdt->Project("vdt0","vz","weight*(jtpt2>120 && jtpt2>30)");
+  ntmc->Project("vmc0","vz","pthatweight*(jtpt2>120 && jtpt2>30 && pthatsample>30)");
+  
+  vdt0->Scale(1/vdt0->Integral());
+  vmc0->Scale(1/vmc0->Integral());
+
+  plotylog = false;
+  Draw({vdt0,vmc0});
+
+  auto vdt = new TH1F("vdt","Data weighted",30,-15,15); vdt->Sumw2();
+  auto vmc = new TH1F("vmc","MC weighted",30,-15,15); vmc->Sumw2();
+
+  ntdt->Project("vdt","vz","weight*(jtpt2>120 && jtpt2>30)");
+  ntmc->Project("vmc","vz","weight*(jtpt2>120 && jtpt2>30 && pthatsample>30)");
+  
+  vdt->Scale(1/vdt->Integral());
+  vmc->Scale(1/vmc->Integral());
+
+
+  SetMC({vmc, vmc0});
+  SetData({vdt,vdt0});
+  SetInc({vmc, vmc0});
+
+
+  fout->cd();
+  vdt->Write();
+  vmc->Write();
+  vdt0->Write();
+  vmc0->Write();
+  fmc->Close();
+  fdt->Close();
+}
 
 void histbuildc(TString dtsample, TString mcsample, TString cbin)
 {
@@ -349,16 +392,18 @@ void histbuildc(TString dtsample, TString mcsample, TString cbin)
   fout = new TFile(Form("%s_%s%s.root",dtsample.Data(),mcsample.Data(),cbin.Data()),"recreate");
 
   if (PbPb) checkcentrality(dtdjt, mcdjt);
+
+  checkvertex(dtdjt, mcdjt);
   /*
   checkpthat(mcevt, mcinc,"inc_","jtpt"); 
-  //checkpthat(mcdjt,"dj_","jtpt0");
+  //checkpthat(mcdjt,"dj_","jtpt1");
   */
     checkpthat(mcevt, mcinc,"inc_","jtpt"); 
   checkbjetdatatrig(dtdjt);
-  checkdatadj(dtdjt, mcdjt);
+  checkdatadj(dtdjt, mcdjt);cout<<"dj done!"<<endl;
   checkdatainc(dtinc,mcinc); 
 
-
+cout<<"inc done!"<<endl;
   fout->Close();
   
     histdraw(dtsample, mcsample,cbin);
@@ -377,10 +422,10 @@ void histbuild(TString dtsample, TString mcsample)
   
   histbuildc(dtsample,mcsample,"");
 
-  if (PbPb) {
-    histbuildc(dtsample,mcsample,"0_40");
-    histbuildc(dtsample,mcsample,"80_200");
-  }
+//  if (PbPb) {
+//    histbuildc(dtsample,mcsample,"0_40");
+//    histbuildc(dtsample,mcsample,"80_200");
+//  }
 
 }
 
