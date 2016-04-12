@@ -16,41 +16,53 @@ void findtruthpp()
   auto hdtppxJAS = geth("hdtppxJAS","SL pp Data;x_{J}");
   auto hdtINCppxJAS = geth("hdtINCppxJAS","INC pp Data;x_{J}");
 
-  Fill(fdtpp,{"weight","jtpt1","discr_csvV1_1","jtptSL","dphiSL1"},[&] (dict m) {
-    float w = m["weight"];
-    float dphi = m["dphiSL1"];
+  Fill(fdtpp,{"weight","jtpt1","discr_csvV1_1","jtptSL","dphiSL1","jtpt2","dphi21"},[&] (dict _) {
+    float w = _["weight"];
 
-    if (m["jtpt1"]>pt1cut && m["discr_csvV1_1"]>0.9 && m["jtptSL"]>pt2cut) {
+    if (_["jtpt1"]>pt1cut && _["discr_csvV1_1"]>0.9 && _["jtptSL"]>pt2cut && _["dphiSL1"]>pi23)
+      hdtppxJAS->Fill(_["jtptSL"]/_["jtpt1"],w);
 
-      if (dphi>pi23)
-        hdtppxJAS->Fill(m["jtptSL"]/m["jtpt1"],w);
+    if (_["jtpt1"]>pt1cut && _["jtpt2"]>pt2cut && _["dphi21"]>pi23)
+      hdtINCppxJAS->Fill(_["jtpt2"]/_["jtpt1"],w);
 
-    }
+    },0.3);
 
-    if (m["jtpt1"]>pt1cut && m["jtpt2"]>pt2cut && ) {
-
-
-  },0.3);
-
-  TFile *fmcpp = new TFile("/data_CMS/cms/lisniak/bjet2015/mcppqcdak4PF_djt.root");
+  TFile *fmcpp = new TFile("/data_CMS/cms/lisniak/bjet2015/mcppbfaak4PF_djt.root");
   auto hmcppxJAS = geth("hmcppxJAS","SL pp MC;x_{J}");
 
-  Fill(fmcpp,{"weight","jtpt1","discr_csvV1_1","jtptSL","dphiSL1"},[&] (dict m) {
-    //if (m["pthatsample"]==30) return;
+  Fill(fmcpp,{"weight","jtpt1","discr_csvV1_1","jtptSL","dphiSL1","bProdCode"},[&] (dict m) {
     float w = m["weight"];
-    float dphi = m["dphiSL1"];
 
-    if (m["jtpt1"]>pt1cut && m["discr_csvV1_1"]>0.9 && m["jtptSL"]>pt2cut) {
+    if (m["jtpt1"]>pt1cut && m["discr_csvV1_1"]>0.9 && m["jtptSL"]>pt2cut && m["dphiSL1"]>pi23)
+      hmcppxJAS->Fill(m["jtptSL"]/m["jtpt1"],w*processWeights[(int)m["bProdCode"]]);
 
-      if (dphi>pi23)
-        hdtppxJAS->Fill(m["jtptSL"]/m["jtpt1"],w);
+  });
 
+  TFile *fmcppqcd = new TFile("/data_CMS/cms/lisniak/bjet2015/mcppqcdak4PF_djt.root");
+  auto hmcppqcdxJAS = geth("hmcppqcdxJAS","QCD pp MC;x_{J}");
+
+  Fill(fmcppqcd,{"weight","jtpt1","jtpt2","dphi21"},[&] (dict m) {
+    float w = m["weight"];
+
+    if (m["jtpt1"]>pt1cut && m["jtpt2"]>pt2cut && m["dphi21"]>pi23) {
+        hmcppqcdxJAS->Fill(m["jtpt2"]/m["jtpt1"],w);
     }
 
-  },0.3);
+  });
+
+  SetData({hdtppxJAS,hdtINCppxJAS});
+  SetMC({hmcppxJAS,hmcppqcdxJAS});
+  SetInc({hdtINCppxJAS,hmcppqcdxJAS});
+  SetB({hdtppxJAS,hmcppxJAS});
 
   NormalizeAllHists();
-  Draw({hdtppxJAS});
+  plotputmean = true;
+  aktstring += "R=0.4 |#eta|<1.5";
+  plotsecondline = Form("p_{T,1}>%d GeV, p_{T,2}>%d GeV", (int)pt1cut, (int)pt2cut);
+  plotthirdline = "#Delta#phi>2/3#pi";
+
+  DrawCompare(hdtppxJAS,hmcppxJAS);
+  DrawCompare(hdtINCppxJAS,hmcppqcdxJAS);
 }
 
 
@@ -66,13 +78,8 @@ void findtruthPbPb(int binMin, int binMax)
 
 
 
-  processWeights[0] = 1.2;
-  processWeights[1] = 1.;
-  processWeights[2] = 0.04;
-  processWeights[3] = 0.04;
-
   buildNamesuffix = TString::Format("_bin_%d_%d",binMin, binMax);
-  buildTitlesuffix = TString::Format("%d-%d %%",binMin/2, binMax/2);
+  //  buildTitlesuffix = TString::Format("%d-%d %%",binMin/2, binMax/2);
 
   //check vertex and centrality first
   buildh(40,-15,15);
@@ -94,8 +101,8 @@ void findtruthPbPb(int binMin, int binMax)
 
   // auto hdtxJASSub = geth("hdtxJASSub","SL Data SB subtracted;x_{J}");
   // auto hmcxJASSub = geth("hmcxJASSub","SL MC SB subtracted;x_{J}");
-  auto hdtxJASSubEars = geth("hdtxJASSubEars","SL Data Fancy subtracted;x_{J}");
-  auto hmcxJASSubEars = geth("hmcxJASSubEars","SL MC Fancy subtracted;x_{J}");
+  auto hdtxJASSubEars = geth("hdtxJASSubEars","SL Data;x_{J}");
+  auto hmcxJASSubEars = geth("hmcxJASSubEars","SL MC;x_{J}");
 
 
   //inclusive jets
@@ -106,10 +113,12 @@ void findtruthPbPb(int binMin, int binMax)
 
 
 
-  auto hdtINCxJASSubEars = geth("hdtINCxJASSubEars","INC Data Fancy subtracted;x_{J}");
-  auto hmcINCxJASSubEars = geth("hmcINCxJASSubEars","INC MC Fancy subtracted;x_{J}");
+  auto hdtINCxJASSubEars = geth("hdtINCxJASSubEars","Inclusive Data;x_{J}");
+  auto hmcINCxJASSubEars = geth("hmcINCxJASSubEars","Inclusive MC;x_{J}");
 
 
+  buildh(5,0,5);
+  auto hPairCode = geth("hPairCode");
 
 
   float pi3 = 1./3*3.142;
@@ -186,7 +195,7 @@ void findtruthPbPb(int binMin, int binMax)
 
   });
 
-  Fill(fmcinc,{"weight","jtpt1","jtpt2","dphi21","bin","jteta1","jteta2"},[&] (dict m) {
+  Fill(fmcinc,{"weight","jtpt1","jtpt2","dphi21","bin","jteta1","jteta2","pairCodeSL1","discr_csvV1_1","jtptSL","dphiSL1","pthatsample"},[&] (dict m) {
     if (m["bin"]<binMin || m["bin"]>binMax) return;
 
     float w = m["weight"];
@@ -194,15 +203,22 @@ void findtruthPbPb(int binMin, int binMax)
     float deta = abs(m["jteta1"]-m["jteta2"]);
 
     if (m["jtpt1"]>pt1cut && m["jtpt2"]>pt2cut) {
-
-    if (dphi>pi23)
-        hmcINCxJAS->Fill(m["jtpt2"]/m["jtpt1"],w);
-    if ((dphi<pi3 && (dphi*dphi+deta*deta)>1) || (dphi>pi3 && ((dphi-pi3)*(dphi-pi3)+deta*deta)<1))
-        hmcINCxJEars->Fill(m["jtpt2"]/m["jtpt1"],w);
+      if (dphi>pi23)
+          hmcINCxJAS->Fill(m["jtpt2"]/m["jtpt1"],w);
+      
+      if ((dphi<pi3 && (dphi*dphi+deta*deta)>1) || (dphi>pi3 && ((dphi-pi3)*(dphi-pi3)+deta*deta)<1))
+          hmcINCxJEars->Fill(m["jtpt2"]/m["jtpt1"],w);
     }
 
+    if (m["jtpt1"]>pt1cut && m["discr_csvV1_1"]>0.9 && m["jtptSL"]>pt2cut && m["dphiSL1"]>pi23) {
+      //hPairCode->Fill(m["pairCodeSL1"],w);
+      if (m["pairCodeSL1"]<4)
+        hPairCode->Fill(m["pairCodeSL1"],w);
+//      else hPairCode->Fill(3,w);
+    }
 
   });
+
 
   // Normalize({hdtvz,hmcvz,hdtbin,hmcbin});
 
@@ -218,13 +234,26 @@ void findtruthPbPb(int binMin, int binMax)
   hdtINCxJASSubEars->Add(hdtINCxJAS,hdtINCxJEars,1,-1);
   hmcINCxJASSubEars->Add(hmcINCxJAS,hmcINCxJEars,1,-1);
 
+  NormalizeAllHists();
+  Print(hPairCode);
+  float purity = hPairCode->GetBinContent(1);
+
   plotputmean = true;
   plotylog = false;
+  plotdivide = false;
+  plotymin = 0;
+  plotymax = 0.26;
+  aktstring = "anti-k_{T} Pu R=0.4 |#eta|<1.5";
+  plotsecondline = Form("p_{T,1}>%d GeV, p_{T,2}>%d GeV", (int)pt1cut, (int)pt2cut);
+  plotthirdline = TString::Format("#Delta#phi>2/3#pi %d-%d %% purity=%.2f",binMin/2, binMax/2, purity);
 
-  plotlegendpos = TopLeft;
 
-  NormalizeAllHists();
 
+
+
+
+
+  //  plotlegendpos = TopLeft;
 //  Draw({hdtxJASSubEars, hmcxJASSubEars});
 //  Draw({hdtINCxJASSubEars,hmcINCxJASSubEars});
 
@@ -235,7 +264,12 @@ void findtruthPbPb(int binMin, int binMax)
   SetInc({hdtINCxJASSubEars,hmcINCxJASSubEars});
 
   DrawCompare(hdtxJASSubEars, hmcxJASSubEars);
+
+  plotthirdline = TString::Format("#Delta#phi>2/3#pi %d-%d %%",binMin/2, binMax/2);
+
   DrawCompare(hdtINCxJASSubEars,hmcINCxJASSubEars);
+
+  Draw({hPairCode});
 
 
   // Draw({hdtxJAS,hmcxJAS});
@@ -257,9 +291,18 @@ void findtruthPbPb(int binMin, int binMax)
 
 void tellmetruth()
 {
+  processWeights[0] = 1.2;
+  processWeights[1] = 1.;
+  processWeights[2] = 0.04;
+  processWeights[3] = 0.04;
+
+
+
   findtruthpp();
   findtruthPbPb(0,200);
   findtruthPbPb(0,20);
   findtruthPbPb(20,60);
+  findtruthPbPb(60,200);
+  findtruthPbPb(140,200);
   
 }
