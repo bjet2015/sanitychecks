@@ -3,7 +3,8 @@
 ##Production codes
 Both B-C and C-B come from GSP and FEX mostly
 
-![](Draw_bprodcode45bprodcode54.png)
+![](Draw_bprodcode45bprodcode54.png =200x)
+
 
 Summary of plots below:
 ![](Draw_flavproc54_1.pdf)
